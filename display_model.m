@@ -30,16 +30,16 @@ function display_model( nodeX, nodeY, sigmaX, sigmaY, thetas, alphas, frame)
             c0 = c(curY, curX);
             
             Z = A * exp( - (a0*(X-x0).^2 + 2*b0*(X-x0).*(Y-y0) + c0*(Y-y0).^2));
-            result = result + Z;
+            result = result + ((Z > 0.04) .* (Z < 0.06));
         end
     end
     
     
     
-    thresh = (result > 0.05) * .4;
+    thresh = (result > 0) * .7;
     imshow(frame);
     hold on;
-    highlighter = cat(3, zeros(size(thresh)), ones(size(thresh)), zeros(size(thresh)));
+    highlighter = cat(3, ones(size(thresh)), zeros(size(thresh)), zeros(size(thresh)));
     h = imshow(highlighter);
     %surf(X,Y,result);
     %shading interp;
