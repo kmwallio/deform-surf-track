@@ -1,18 +1,7 @@
-function display_model( nodeX, nodeY, sigmaX, sigmaY, thetas, alphas, frame)
+function display_model( nodeX, nodeY, a, b, c, alphas, frame)
 %DISPLAY_MODEL Given a model, draw it on the image
 %   Given the descriptors of our gaussian model, we draw the resulting
 %   model on top of the current frame.
-
-    cosSQtheta = cos(thetas).^2;
-    sinSQtheta = sin(thetas).^2;
-    sin2theta = 2 * sin(thetas);
-    
-    sigmaX2 = 2 * (sigmaX .^ 2);
-    sigmaY2 = 2 * (sigmaY .^ 2);
-    
-    a = (cosSQtheta ./ sigmaX2) + (sinSQtheta ./ sigmaY2);
-    b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
-    c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
     
     [X, Y] = meshgrid(1:size(frame, 2), 1:size(frame, 1));
     result = zeros(size(frame, 1), size(frame, 2));

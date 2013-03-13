@@ -53,10 +53,21 @@ sigmaX = repmat(abs(xStep / 2), size(nodeX));
 sigmaY = repmat(abs(yStep / 2), size(nodeX));
 alphas = ones(size(nodeX));
 
+cosSQtheta = cos(thetas).^2;
+sinSQtheta = sin(thetas).^2;
+sin2theta = 2 * sin(thetas);
+
+sigmaX2 = 2 * (sigmaX .^ 2);
+sigmaY2 = 2 * (sigmaY .^ 2);
+
+a = (cosSQtheta ./ sigmaX2) + (sinSQtheta ./ sigmaY2);
+b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
+c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
+
 % Track the deformation
 for curFrame = 1:1%numFrames-2
     disp(strcat('On frame: ', num2str(curFrame)));
-    display_model(nodeX, nodeY, sigmaX, sigmaY, thetas, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
+    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
     
@@ -71,3 +82,4 @@ for curFrame = 1:1%numFrames-2
     % Calculate the Elastic Deformation
     disp('  Elastic Deformation');
 end
+close(mm);
