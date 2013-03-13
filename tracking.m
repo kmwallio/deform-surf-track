@@ -65,21 +65,27 @@ b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
 c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
 
 % Track the deformation
-for curFrame = 1:1%numFrames-2
+for curFrame = 1:numFrames-2
     disp(strcat('On frame: ', num2str(curFrame)));
     display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
     
     % Calculate the Global Deformation
+    [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 1/4);
+    [dX, dY] = global_deformation(nodeX, nodeY, a, b, c, alphas, i4X, i4Y, i4T);
+    nodeX = nodeX + dX;
+    nodeY = nodeY + dY;
     disp('  Global Deformation');
 
     
     % Calculate the Affine Deformation
+    [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Affine Deformation');
 
     
     % Calculate the Elastic Deformation
+    [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Elastic Deformation');
 end
 close(mm);
