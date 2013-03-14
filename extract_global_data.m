@@ -18,7 +18,7 @@ function [ data, iData ] = extract_global_data( nodeX, nodeY, a, b, c, alphas , 
         end
     end
     
-    contributing = sum(sum(contribute))
+    contributing = sum(sum(contribute));
     data = zeros(contributing, 3);
     iData = zeros(contributing, 3);
     

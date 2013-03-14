@@ -8,7 +8,8 @@ function [ dX, dY ] = global_deformation( nodeX, nodeY, a, b, c, alphas, iX, iY,
     guess = rand(1, 2) - 0.5;
     
     options = optimset('MaxFunEvals', 5000, 'MaxIter', 5000);
-    s = lsqnonlin(@globalTrans, guess, [], [], options);
+    %s = lsqnonlin(@globalTrans, guess, [], [], options);
+    s = fminsearch(@globalTrans, guess, options);
     
     dX = s(1);
     dY = s(2);
@@ -16,7 +17,7 @@ function [ dX, dY ] = global_deformation( nodeX, nodeY, a, b, c, alphas, iX, iY,
     function [sse] = globalTrans(a)
         displaced = [a(1) a(2) 1]';
         sse = sum(grad * displaced, 2);
-        %sse = sum(abs(sse));
+        sse = sum(abs(sse));
     end
 
 end
