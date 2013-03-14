@@ -89,5 +89,18 @@ for curFrame = 1:numFrames-2
     % Calculate the Elastic Deformation
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Elastic Deformation');
+    affMats = elastic_deformation(nodeX, nodeY, a, b, c, alphas, iX, iY, iT);
+    nodes = size(nodeX, 1) * size(nodeX, 2);
+    width = size(nodeX, 2);
+    height = size(nodeX, 1);
+    for h = 1:height
+        for w = 1:height
+            idx = ((h - 1) * width) + w;
+            affMat = affMats(:,:,idx);
+            [nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w)] = apply_mat_model(nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w), alphas(h, w), affMat);
+        end
+    end
+    
+    
 end
 close(mm);
