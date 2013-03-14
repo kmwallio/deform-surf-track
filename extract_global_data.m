@@ -3,7 +3,7 @@ function [ data, iData ] = extract_global_data( nodeX, nodeY, a, b, c, alphas , 
 %   Given the model, extracts contributing data.  That is data where the
 %   spatial derivative is non-zero and the point is contained in the model.
     
-    contribute = zeros(size(iX));
+    contribute = zeros(size(iX, 1), size(iX, 2));
     
     startY = 1;
     startX = 1;
@@ -18,7 +18,7 @@ function [ data, iData ] = extract_global_data( nodeX, nodeY, a, b, c, alphas , 
         end
     end
     
-    contributing = sum(sum(contribute));
+    contributing = sum(sum(contribute))
     data = zeros(contributing, 3);
     iData = zeros(contributing, 3);
     

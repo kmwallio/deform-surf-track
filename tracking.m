@@ -72,16 +72,18 @@ for curFrame = 1:numFrames-2
     writeVideo(mm, getframe);
     
     % Calculate the Global Deformation
+    disp('  Global Deformation');
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 1/4);
     [dX, dY] = global_deformation(nodeX, nodeY, a, b, c, alphas, i4X, i4Y, i4T);
     nodeX = nodeX + dX;
     nodeY = nodeY + dY;
-    disp('  Global Deformation');
 
     
     % Calculate the Affine Deformation
-    [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Affine Deformation');
+    [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
+    affMat = affine_deformation(nodeX, nodeY, a, b, c, alphas, i2X, i2Y, i2T);
+    [nodeX, nodeY, a, b, c] = apply_mat_model(nodeX, nodeY, a, b, c, alphas, affMat);
 
     
     % Calculate the Elastic Deformation
