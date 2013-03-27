@@ -14,7 +14,8 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     lambda = .3;
     
     coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
-    avgmat = sum(coverage, 3);
+    goodGrad = ((iX + iY + iT) > 0);
+    avgmat = sum(coverage, 3) .* goodGrad;
     gradmat = get_grad_mat(avgmat, iX, iY, iT);
     g = randn(2, 3 * nodes);
     

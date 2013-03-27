@@ -1,5 +1,6 @@
 % Read in the video frames
 frameFiles = dir('./frames');
+outfolder = './output';
 
 numFrames = size(frameFiles, 1);
 
@@ -40,10 +41,10 @@ open(mm);
 % Create the inital placement for the model
 xMax = 368;
 xMin = 153;
-xStep = (xMax - xMin) / 6;
+xStep = (xMax - xMin) / 4;
 yMax = 304;
 yMin = 221;
-yStep = (yMin - yMax) / 4;
+yStep = (yMin - yMax) / 3;
 
 % Meshgrid returns a set of points, we use these points as the
 % center of our nodes
@@ -63,6 +64,10 @@ sigmaY2 = 2 * (sigmaY .^ 2);
 a = (cosSQtheta ./ sigmaX2) + (sinSQtheta ./ sigmaY2);
 b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
 c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
+affMat = 0;
+affMats = 0;
+dX = 0;
+dY = 0;
 
 % Track the deformation
 for curFrame = 1:numFrames-2
@@ -70,11 +75,14 @@ for curFrame = 1:numFrames-2
     display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
+    save(strcat(outfolder,'/',sprintf('frame_%05d.mat', curFrame)), 'nodeX','nodeY','a','b','c','alphas','affMats','affMat','dX','dY');
+    F = getframe;
+    imwrite(F.cdata, strcat(outfolder,'/',sprintf('frame_%05d.png', curFrame)), 'png');
     
     % Calculate the Global Deformation
     disp('  Global Deformation');
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 1/4);
-    [dX, dY] = global_deformation(nodeX, nodeY, a, b, c, alphas, i4X, i4Y, i4T);
+    [dX, dY] = global_deformation(nodeX, nodeY, a, b, c, alphas, i4X(:,:,curFrame), i4Y(:,:,curFrame), i4T(:,:,curFrame));
     nodeX = nodeX + dX;
     nodeY = nodeY + dY;
 
@@ -82,14 +90,14 @@ for curFrame = 1:numFrames-2
     % Calculate the Affine Deformation
     disp('  Affine Deformation');
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
-    affMat = affine_deformation(nodeX, nodeY, a, b, c, alphas, i2X, i2Y, i2T);
+    affMat = affine_deformation(nodeX, nodeY, a, b, c, alphas, i2X(:,:,curFrame), i2Y(:,:,curFrame), i2T(:,:,curFrame));
     [nodeX, nodeY, a, b, c] = apply_mat_model(nodeX, nodeY, a, b, c, alphas, affMat);
 
     
     % Calculate the Elastic Deformation
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Elastic Deformation');
-    affMats = elastic_deformation(nodeX, nodeY, a, b, c, alphas, iX, iY, iT);
+    affMats = elastic_deformation(nodeX, nodeY, a, b, c, alphas, iX(:,:,curFrame), iY(:,:,curFrame), iT(:,:,curFrame));
     nodes = size(nodeX, 1) * size(nodeX, 2);
     width = size(nodeX, 2);
     height = size(nodeX, 1);
@@ -100,7 +108,5 @@ for curFrame = 1:numFrames-2
             [nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w)] = apply_mat_model(nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w), alphas(h, w), affMat);
         end
     end
-    
-    
 end
 close(mm);

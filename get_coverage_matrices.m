@@ -27,7 +27,5 @@ function [ coverage ] = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX
             coverage(:,:,idx) = (Z > 0.05);
         end
     end
-    
-
 end
 
