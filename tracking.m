@@ -17,12 +17,12 @@ for idx = 3:length(frameFiles)
     rgbimg = imread(strcat('./frames/', frameFiles(idx).name), 'PNG');
     
     % Convert to black and white
-    gray = (sum(rgbimg, 3) / 3) / 255;
+    gray = (sum(rgbimg, 3) / 3);
     
     fullFrames(:,:,idx - 2) = gray;
-    halfFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.5), 3) / 3) / 255;
-    quarterFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.25), 3) / 3) / 255;
-    eighthFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.125), 3) / 3) / 255;
+    halfFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.5), 3) / 3);
+    quarterFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.25), 3) / 3);
+    eighthFrames(:,:,idx - 2) = (sum(imresize_old(rgbimg, 0.125), 3) / 3);
 end
 
 disp('Calculating Spatial Derivatives');
@@ -38,12 +38,12 @@ mm = VideoWriter('mesh_deformation.avi');
 open(mm);
 
 % Create the inital placement for the model
-xMax = 418;
-xMin = 103;
-xStep = (xMax - xMin) / 20;
-yMax = 354;
-yMin = 171;
-yStep = (yMin - yMax) / 16;
+xMax = 368;
+xMin = 153;
+xStep = (xMax - xMin) / 6;
+yMax = 304;
+yMin = 221;
+yStep = (yMin - yMax) / 4;
 
 % Meshgrid returns a set of points, we use these points as the
 % center of our nodes

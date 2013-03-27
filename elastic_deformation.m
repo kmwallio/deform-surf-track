@@ -11,7 +11,7 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     height = size(nodeX, 1);
     imwidth = size(iX, 2);
     imheight = size(iY, 1);
-    lambda = 10;
+    lambda = .3;
     
     coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
     avgmat = sum(coverage, 3);
@@ -26,23 +26,22 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
         [amat, dmat] = to_affine(guess);
         dis_mat = zeros(size(gradmat));
         div_mat = zeros(size(gradmat,1), 1);
-        
+        i = 1;
         for h = 1:imheight
             for w = 1:imwidth
-                if contrib(h, w) > 0.5
+                if avgmat(h, w) > 0.5
                     for n = 1:nodes
                         if coverage(h, w, n) > 0.5
-                            disvec = dmat(:,:,n) * [w h 1];
+                            disvec = dmat(:,:,n) * [w h 1]';
                             dis_mat(i, :) = dis_mat(i,:) + disvec';
                             div_mat(i) = div_mat(i) + 1;
-                            i = i + 1;
                         end
                     end
+                    dis_mat(i, :) = dis_mat(i, :) / div_mat(i);
+                    i = i + 1;
                 end
             end
         end
-        
-        dis_mat = dis_mat ./ div_mat;
         
         sse = sum(gradmat .* dis_mat, 2);
         
