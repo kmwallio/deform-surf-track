@@ -11,7 +11,7 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     height = size(nodeX, 1);
     imwidth = size(iX, 2);
     imheight = size(iY, 1);
-    lambda = .3;
+    lambda = 500;
     
     coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
     goodGrad = ((iX + iY + iT) > 0);
