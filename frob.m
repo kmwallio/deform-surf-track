@@ -4,7 +4,7 @@ function [ frobb ] = frob( affMats )
     frobb = 0;
     c = size(affMats, 3);
     for i = 1:c
-        frobb = frobb + norm(affMats(:,:,i), 'fro');
+        frobb = frobb + norm(affMats(:,:,i) - eye(3, 3), 'fro');
     end
 end
 
