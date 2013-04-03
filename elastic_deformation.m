@@ -11,7 +11,7 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     height = size(nodeX, 1);
     imwidth = size(iX, 2);
     imheight = size(iY, 1);
-    lambda = 500;
+    lambda = 100;
     
     coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
     goodGrad = ((iX + iY + iT) > 0);
@@ -24,39 +24,40 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     [affMats, ~] = to_affine(ag);
     
     function [sse] = elasticity(guess)
-        [amat, dmat] = to_affine(guess);
-        dis_mat = zeros(size(gradmat));
-        div_mat = zeros(size(gradmat,1), 1);
-        i = 1;
-        for h = 1:imheight
-            for w = 1:imwidth
-                if avgmat(h, w) > 0.5
-                    for n = 1:nodes
-                        if coverage(h, w, n) > 0.5
-                            disvec = dmat(:,:,n) * [w h 1]';
-                            dis_mat(i, :) = dis_mat(i,:) + disvec';
-                            div_mat(i) = div_mat(i) + 1;
+        sse = [find_mat(guess); frobbb(guess)];
+        
+        function [ssee] = find_mat(guesss)
+            [~, dmat] = to_affine(guesss);
+            dis_mat = zeros(size(gradmat));
+            i = 1;
+            for h = 1:imheight
+                for w = 1:imwidth
+                    if avgmat(h, w) > 0.5
+                        div_mat = 0;
+                        for n = 1:nodes
+                            if coverage(h, w, n) > 0.5
+                                disvec = dmat(:,:,n) * [w h 1]';
+                                dis_mat(i, :) = dis_mat(i,:) + disvec';
+                                div_mat = div_mat + 1;
+                            end
                         end
+                        dis_mat(i, :) = dis_mat(i, :) / div_mat;
+                        i = i + 1;
                     end
-                    dis_mat(i, :) = dis_mat(i, :) / div_mat(i);
-                    i = i + 1;
                 end
             end
+
+            ssee = sum(gradmat .* dis_mat, 2);
         end
         
-        sse = sum(gradmat .* dis_mat, 2);
-        
-        reg = sqrt(lambda * frob(amat));
-        
-        sse(size(sse, 1)) = reg;
+        function [ssee] = frobbb(guesss)
+            [amat, ~] = to_affine(guesss);
+            alen = size(amat, 3);
+            ssee = zeros(alen, 1);
+            for i = 1:alen
+                ssee(i) = lambda * norm(amat(:,:,i) - eye(3, 3), 'fro');
+            end
+        end
     end
-    
-%     for h = 1:height
-%         for w = 1:width
-%             idx = ((h - 1) * width) + w;
-%             affMats(:,:,idx) = affine_deformation(nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w), alphas(h, w), iX, iY, iT);
-%         end
-%     end
-
 end
 

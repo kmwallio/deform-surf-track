@@ -1,11 +1,11 @@
 % Read in the video frames
-frameFiles = dir('./frames');
+frameFiles = dir('./frames_translation');
 outfolder = './output';
 
 numFrames = size(frameFiles, 1);
 
-vidWidth = 640;
-vidHeight = 480;
+vidWidth = 720;
+vidHeight = 540;
 
 fullFrames = zeros(vidHeight, vidWidth, numFrames);
 halfFrames = zeros(vidHeight / 2, vidWidth / 2, numFrames);
@@ -15,7 +15,7 @@ eighthFrames = zeros(vidHeight / 8, vidWidth / 8, numFrames);
 disp('Loading Images');
 
 for idx = 3:length(frameFiles)
-    rgbimg = imread(strcat('./frames/', frameFiles(idx).name), 'PNG');
+    rgbimg = imread(strcat('./frames_translation/', frameFiles(idx).name), 'PNG');
     
     % Convert to black and white
     gray = (sum(rgbimg, 3) / 3);
@@ -39,19 +39,19 @@ mm = VideoWriter('mesh_deformation.avi');
 open(mm);
 
 % Create the inital placement for the model
-xMax = 368;
-xMin = 153;
+xMax = 280;
+xMin = 80;
 xStep = (xMax - xMin) / 3;
-yMax = 304;
-yMin = 221;
-yStep = (yMin - yMax) / 2;
+yMax = 200;
+yMin = 90;
+yStep = (yMin - yMax) / 1;
 
 % Meshgrid returns a set of points, we use these points as the
 % center of our nodes
 [nodeX, nodeY] = meshgrid(xMin:xStep:xMax, yMax:yStep:yMin);
 thetas = zeros(size(nodeX));
 sigmaX = repmat(abs(xStep / 2.4), size(nodeX));
-sigmaY = repmat(abs(yStep / 2.4), size(nodeX));
+sigmaY = repmat(abs(yStep / 3.4), size(nodeX));
 alphas = ones(size(nodeX));
 
 cosSQtheta = cos(thetas).^2;
@@ -72,7 +72,7 @@ dY = 0;
 % Track the deformation
 for curFrame = 1:numFrames-2
     disp(strcat('On frame: ', num2str(curFrame)));
-    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
+    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames_translation/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
     save(strcat(outfolder,'/',sprintf('frame_%05d.mat', curFrame)), 'nodeX','nodeY','a','b','c','alphas','affMats','affMat','dX','dY');

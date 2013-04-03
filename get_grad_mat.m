@@ -1,6 +1,6 @@
 function [ grad_mat ] = get_grad_mat( avgmat, iX, iY, iT )
     contrib = sum(sum(avgmat > 0.5));
-    grad_mat = zeros(contrib + 1, 3);
+    grad_mat = zeros(contrib, 3);
     i = 1;
     
     width = size(iX, 2);
