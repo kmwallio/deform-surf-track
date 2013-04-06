@@ -3,7 +3,7 @@ source_image = 'source.png';
 % Source Image should be the first frame with the overlayed image
 % present.
 
-target_dir = './frames/';
+target_dir = './frames_translation/';
 target_data = './input/'; % There should be a 1-to-1 numbering of files
 output_dir = './output_mapped/';
 

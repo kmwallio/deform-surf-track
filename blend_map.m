@@ -24,7 +24,7 @@ function [ x, y ] = blend_map( xS, yS, nodeXO, nodeYO, aO, bO, cO, alphasO, node
             mEh = cEig' * mEh';
             
             [oEig, oEigg] = eig(orgMat);
-            mEg = (oEig' * mEh) + [nodeXO(h, w) nodeYO(h, w)]';
+            mEg = (inv(oEig) * mEh) + [nodeXO(h, w) nodeYO(h, w)]';
             
             x = x + (mEg(1) * (numer / divider));
             y = y + (mEg(2) * (numer / divider));

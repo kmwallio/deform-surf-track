@@ -1,21 +1,21 @@
 % Read in the video frames
-frameFiles = dir('./frames');
+frameFiles = dir('./frames-min');
 outfolder = './output';
 
-numFrames = size(frameFiles, 1);
+numberOfFrames = length(frameFiles);
 
 vidWidth = 640;
 vidHeight = 480;
 
-fullFrames = zeros(vidHeight, vidWidth, numFrames);
-halfFrames = zeros(vidHeight / 2, vidWidth / 2, numFrames);
-quarterFrames = zeros(vidHeight / 4, vidWidth / 4, numFrames);
-eighthFrames = zeros(vidHeight / 8, vidWidth / 8, numFrames);
+fullFrames = zeros(vidHeight, vidWidth, numberOfFrames);
+halfFrames = zeros(vidHeight / 2, vidWidth / 2, numberOfFrames);
+quarterFrames = zeros(vidHeight / 4, vidWidth / 4, numberOfFrames);
+eighthFrames = zeros(vidHeight / 8, vidWidth / 8, numberOfFrames);
 
 disp('Loading Images');
 
 for idx = 3:length(frameFiles)
-    rgbimg = imread(strcat('./frames/', frameFiles(idx).name), 'PNG');
+    rgbimg = imread(strcat('./frames-min/', frameFiles(idx).name), 'PNG');
     
     % Convert to black and white
     gray = (sum(rgbimg, 3) / 3);
@@ -39,11 +39,11 @@ mm = VideoWriter('mesh_deformation.avi');
 open(mm);
 
 % Create the inital placement for the model
-xMax = 368;
-xMin = 153;
+xMax = 410;
+xMin = 200;
 xStep = (xMax - xMin) / 3;
-yMax = 304;
-yMin = 221;
+yMax = 310;
+yMin = 228;
 yStep = (yMin - yMax) / 2;
 
 % Meshgrid returns a set of points, we use these points as the
@@ -70,9 +70,9 @@ dX = 0;
 dY = 0;
 
 % Track the deformation
-for curFrame = 1:numFrames-2
+for curFrame = 1:(numberOfFrames - 2)
     disp(strcat('On frame: ', num2str(curFrame)));
-    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
+    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames-min/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
     save(strcat(outfolder,'/',sprintf('frame_%05d.mat', curFrame)), 'nodeX','nodeY','a','b','c','alphas','affMats','affMat','dX','dY');
