@@ -2,15 +2,15 @@
 frameFiles = dir('./frames-min');
 outfolder = './output';
 
-numberOfFrames = length(frameFiles);
+numFrames = length(frameFiles);
 
 vidWidth = 640;
 vidHeight = 480;
 
-fullFrames = zeros(vidHeight, vidWidth, numberOfFrames);
-halfFrames = zeros(vidHeight / 2, vidWidth / 2, numberOfFrames);
-quarterFrames = zeros(vidHeight / 4, vidWidth / 4, numberOfFrames);
-eighthFrames = zeros(vidHeight / 8, vidWidth / 8, numberOfFrames);
+fullFrames = zeros(vidHeight, vidWidth, numFrames);
+halfFrames = zeros(vidHeight / 2, vidWidth / 2, numFrames);
+quarterFrames = zeros(vidHeight / 4, vidWidth / 4, numFrames);
+eighthFrames = zeros(vidHeight / 8, vidWidth / 8, numFrames);
 
 disp('Loading Images');
 
@@ -70,9 +70,9 @@ dX = 0;
 dY = 0;
 
 % Track the deformation
-for curFrame = 1:(numberOfFrames - 2)
+for curFrame = 1:numFrames-2
     disp(strcat('On frame: ', num2str(curFrame)));
-    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames-min/',frameFiles(2 + curFrame).name)));
+    display_model(nodeX, nodeY, a, b, c, alphas, imread(strcat('./frames/',frameFiles(2 + curFrame).name)));
     drawnow;
     writeVideo(mm, getframe);
     save(strcat(outfolder,'/',sprintf('frame_%05d.mat', curFrame)), 'nodeX','nodeY','a','b','c','alphas','affMats','affMat','dX','dY');
@@ -85,6 +85,13 @@ for curFrame = 1:(numberOfFrames - 2)
     [dX, dY] = global_deformation(nodeX, nodeY, a, b, c, alphas, i4X(:,:,curFrame), i4Y(:,:,curFrame), i4T(:,:,curFrame));
     nodeX = nodeX + dX;
     nodeY = nodeY + dY;
+    
+    % Compute Warped image and new spatial derivative
+    warpedImage = imtransform(halfFrames(:,:,curFrame), [1 0 (2*dX); 0 1 (2*dY); 0 0 1]', 'XData', [1 size(halfFrames, 2)], 'YData', [1 size(halfFrames, 1)]);
+    warpedImageFull = imtransform(fullFrames(:,:,curFrame), [1 0 (4*dX); 0 1 (4*dY); 0 0 1]', 'XData', [1 size(fullFrames, 2)], 'YData', [1 size(fullFrames, 1)]);
+    [i2X(:,:,curFrame), i2Y(:,:,curFrame), i2T(:,:,curFrame)] = compute_spatial_derivative_two(warpedImage, halfFrames(:,:,curFrame + 1));
+    imshow(warpedImageFull);
+    imwrite(warpedImageFull, strcat(outfolder,'/',sprintf('warp_displ_%05d.png', curFrame)), 'png');
 
     
     % Calculate the Affine Deformation
@@ -92,7 +99,14 @@ for curFrame = 1:(numberOfFrames - 2)
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     affMat = affine_deformation(nodeX, nodeY, a, b, c, alphas, i2X(:,:,curFrame), i2Y(:,:,curFrame), i2T(:,:,curFrame));
     [nodeX, nodeY, a, b, c] = apply_mat_model(nodeX, nodeY, a, b, c, alphas, affMat);
-
+    
+    % Compute Warped image and new spatial derivative
+    affMat(1, 3) = 2 * affMat(1, 3);
+    affMat(2, 3) = 2 * addMat(2, 3);
+    warpedImageFull = imtransform(warpedImageFull, affMat', 'XData', [1 size(fullFrames, 2)], 'YData', [1 size(fullFrames, 1)]);
+    [iX(:,:,curFrame), iY(:,:,curFrame), iT(:,:,curFrame)] = compute_spatial_derivative_two(warpedImageFull, fullFrames(:,:,curFrame + 1));
+    imshow(warpedImageFull);
+    imwrite(warpedImageFull, strcat(outfolder,'/',sprintf('warp_aff_%05d.png', curFrame)), 'png');
     
     % Calculate the Elastic Deformation
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
