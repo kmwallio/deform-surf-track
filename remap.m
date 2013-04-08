@@ -3,7 +3,7 @@ source_image = 'source.png';
 % Source Image should be the first frame with the overlayed image
 % present.
 
-target_dir = './frames_translation/';
+target_dir = './frames-min/';
 target_data = './input/'; % There should be a 1-to-1 numbering of files
 output_dir = './output_mapped/';
 
@@ -21,7 +21,8 @@ aO = a;
 bO = b;
 cO = c;
 alphasO = alphas;
-
+figure;
+hold on;
 for idx = 3:length(inputFiles)
     myBar = waitbar(0, 'Processing');
     disp(strcat('On frame: ', num2str(idx - 2)));
@@ -29,8 +30,25 @@ for idx = 3:length(inputFiles)
     load(strcat(target_data, inputFiles(idx).name));
     width = size(targetImg, 2);
     height = size(targetImg, 1);
-    for h = 1:height
-        for w = 1:width
+    
+    
+    coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, targetImg, targetImg, targetImg );
+    covMat = sum(coverage, 3) >= 1;
+    
+    [mW, mH] = meshgrid(1:1:width, 1:1:height);
+    mW = mW .* covMat;
+    mH = mH .* covMat;
+    
+    endH = max(max(mH));
+    mH(mH==0) = endH;
+    startH = min(min(mH));
+    endW = max(max(mW));
+    mW(mW==0) = endW;
+    startW = min(min(mW));
+    
+    
+    for h = startH:endH
+        for w = startW:endW
             donep = ((h-1) * width + w) / (width * height);
             waitbar(donep, myBar, sprintf('%0.04f%%', donep * 100));
             [tX, tY] = blend_map( w, h, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas );
@@ -40,6 +58,8 @@ for idx = 3:length(inputFiles)
                 sourceCol = sourceImg(tY,tX,:);
                 if sourceCol(:,:,2) ~= 255
                     targetImg(h, w, :) = sourceCol;
+                    imshow(targetImg);
+                    drawnow;
                 end
             end
         end
