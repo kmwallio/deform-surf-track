@@ -12,7 +12,7 @@ function [ nX, nY ] = warp_aff( source, affMats, weights )
     
     affMatsS = size(affMats, 3);
     for i = 1:affMatsS
-        fprintf('      Contributer %d%n', i);
+        disp(sprintf('      Contributer %d', i));
         t = maketform('affine', affMats(:,:,i)');
         possibleX(:,:,i) = imtransform(vX, t, 'XData', xdat, 'YData', ydat);
         possibleX(:,:,i) = (possibleX(:,:,i) .* weights(:,:,i)) ./ divBy;
@@ -23,9 +23,22 @@ function [ nX, nY ] = warp_aff( source, affMats, weights )
     nX = round(sum(possibleX, 3));
     nY = round(sum(possibleY, 3));
     
-    disp('      Removing bad values');
-    nX = nX .* (nX > 0) .* (nX <= size(source, 2));
-    nY = nY .* (nY > 0) .* (nY <= size(source, 1));
-    nX = nX + ((nX == 0) .* vX);
-    nY = nY + ((nY == 0) .* vY);
+    disp('      Removing bad x values');
+    badX = (nX > 0);
+    goodX = size(source, 2);
+    badX = badX .* (nX <= goodX);
+    nX = nX .* badX;
+    disp('      Removing bad y values');
+    badY = (nY > 0);
+    goodY = size(source, 1);
+    badY = badY .* (nX <= goodY);
+    nY = nY .* badY;
+    disp('      Cleaning up');
+    cleanX = (nX == 0);
+    cleanX = cleanX .* vX;
+    cleanY = (nY == 0);
+    cleanY = cleanY .* vY;
+    nX = nX + cleanX;
+    nY = nY + cleanY;
+    disp('      Done...');
 end

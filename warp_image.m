@@ -10,9 +10,19 @@ function [ warped ] = warp_image( source, target, nodeXO, nodeYO, aO, bO, cO, al
     disp('  Finding weighted transform');
     [nX, nY] = warp_aff(source, affMats, weights);
     
-    [vX, vY] = meshgrid(1:size(source,2), 1:size(source,1));
+%    [vX, vY] = meshgrid(1:size(source,2), 1:size(source,1));
     disp('  Moving things into place');
-    warped(vY, vX, :) = source(nY, nX, :);
+    
+    width = size(source, 2);
+    height = size(source, 1);
+    
+    for h = 1:height
+        for w = 1:width
+            warped(h, w, :) = source(nY(h, w), nX(h, w), :);
+%             if coverageT(h, w) == 0
+%                 warped(h, w) = target(h, w);
+%             end
+        end
+    end
     disp('  Placing onto target');
-    warped = (warped .* coverageT) + (target .* (coverageT == 0));
 end
