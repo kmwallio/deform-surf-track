@@ -19,9 +19,9 @@ function [ warped ] = warp_image( source, target, nodeXO, nodeYO, aO, bO, cO, al
     for h = 1:height
         for w = 1:width
             warped(h, w, :) = source(nY(h, w), nX(h, w), :);
-%             if coverageT(h, w) == 0
-%                 warped(h, w) = target(h, w);
-%             end
+             if coverageT(h, w) == 0
+                 warped(h, w,:) = target(h, w,:);
+             end
         end
     end
     disp('  Placing onto target');

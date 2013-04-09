@@ -34,6 +34,9 @@ for idx = 4:length(inputFiles)
     targetImg = imread(strcat(target_dir, frameFiles(idx).name), 'PNG');
     load(strcat(target_data, inputFiles(idx).name));
     
+    sourceImg = imtransform(sourceImg, maketform('affine', [1 0 (4*dX); 0 1 (4*dY); 0 0 1]'), 'XData', [1 size(sourceImg, 2)], 'YData', [1 size(sourceImg, 1)]);
+    sourceImg = imtransform(sourceImg, maketform('affine', affMat'), 'XData', [1 size(sourceImg, 2)], 'YData', [1 size(sourceImg, 1)]);
+    
     sourceImg = warp_image(sourceImg, targetImg, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas, affMats);
     
     nodeXO = nodeX;

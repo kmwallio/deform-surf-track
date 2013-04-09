@@ -11,11 +11,12 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     height = size(nodeX, 1);
     imwidth = size(iX, 2);
     imheight = size(iY, 1);
-    lambda = 1;
+    lambda = 10;
     
-    coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
+    [coverage, weights] = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
     goodGrad = ((iX + iY + iT) > 0);
     avgmat = sum(coverage, 3) .* goodGrad;
+    sumWeight = sum(weights, 3);
     gradmat = get_grad_mat(avgmat, iX, iY, iT);
     g = randn(2, 3 * nodes);
     
@@ -33,15 +34,13 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
             for h = 1:imheight
                 for w = 1:imwidth
                     if avgmat(h, w) > 0.5
-                        div_mat = 0;
                         for n = 1:nodes
                             if coverage(h, w, n) > 0.5
                                 disvec = dmat(:,:,n) * [w h 1]';
+                                disvec = disvec * (weights(h, w, n) / sumWeight(h, w));
                                 dis_mat(i, :) = dis_mat(i,:) + disvec';
-                                div_mat = div_mat + 1;
                             end
                         end
-                        dis_mat(i, :) = dis_mat(i, :) / div_mat;
                         i = i + 1;
                     end
                 end
@@ -55,7 +54,7 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
             alen = size(amat, 3);
             ssee = zeros(alen, 1);
             for i = 1:alen
-                ssee(i) = lambda * norm(amat(:,:,i) - eye(3, 3), 'fro');
+                ssee(i) = lambda * norm(amat(1:2,1:2,i) - eye(2, 2), 'fro');
             end
         end
     end
