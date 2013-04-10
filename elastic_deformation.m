@@ -1,4 +1,4 @@
-function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, iY, iT )
+function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, iY, iT, lambda )
 %ELASTIC_DEFORMATION Calculates the elastic deformaion for the model from
 %the data
 %   Calculates an affine transformation for each node and smooths the
@@ -11,7 +11,7 @@ function [ affMats ] = elastic_deformation( nodeX, nodeY, a, b, c, alphas, iX, i
     height = size(nodeX, 1);
     imwidth = size(iX, 2);
     imheight = size(iY, 1);
-    lambda = 10;
+    %lambda = 1;
     
     [coverage, weights] = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, iX, iY, iT );
     goodGrad = ((iX + iY + iT) > 0);

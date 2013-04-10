@@ -1,4 +1,4 @@
-function [ warped ] = warp_image( source, target, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas, affMats )
+function [ warped ] = warp_image( source, target, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas, affMats, mapfuture )
 %WARP_IMAGE Warps an image
     
     warped = source;
@@ -19,7 +19,7 @@ function [ warped ] = warp_image( source, target, nodeXO, nodeYO, aO, bO, cO, al
     for h = 1:height
         for w = 1:width
             warped(h, w, :) = source(nY(h, w), nX(h, w), :);
-             if coverageT(h, w) == 0
+             if coverageT(h, w) == 0 && mapfuture
                  warped(h, w,:) = target(h, w,:);
              end
         end
