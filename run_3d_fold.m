@@ -1,16 +1,22 @@
-lambdas = [10 100 500];
+lambdas = [1 10 100 500];
 
-in_dir = './frames-3drot/';
+in_dir = './frames/';
 
 frameFiles = dir(in_dir);
 for lambda = lambdas
     % 12 nodes
-    xMax = 465;
-    xMin = 305;
-    xStep = (xMax - xMin) / 3;
-    yMax = 280;
-    yMin = 188;
-    yStep = (yMin - yMax) / 2;
+    xMax = 410;
+xMin = 200;
+xStep = (xMax - xMin) / 3;
+yMax = 310;
+yMin = 228;
+yStep = (yMin - yMax) / 2;
+%     xMax = 465;
+%     xMin = 305;
+%     xStep = (xMax - xMin) / 3;
+%     yMax = 280;
+%     yMin = 188;
+%     yStep = (yMin - yMax) / 2;
 
     [nodeX, nodeY] = meshgrid(xMin:xStep:xMax, yMax:yStep:yMin);
     thetas = zeros(size(nodeX));
@@ -29,15 +35,15 @@ for lambda = lambdas
     b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
     c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
     
-    test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, sprintf('./3d-four-%d/', lambda) )
+    test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, sprintf('./fold-four-%d/', lambda) )
 
     % 35 nodes
-    xMax = 487;
-    xMin = 287;
-    xStep = (xMax - xMin) / 6;
-    yMax = 296;
-    yMin = 164;
-    yStep = (yMin - yMax) / 4;
+xMax = 430;
+xMin = 180;
+xStep = (xMax - xMin) / 6;
+yMax = 330;
+yMin = 218;
+yStep = (yMin - yMax) / 4;
 
     [nodeX, nodeY] = meshgrid(xMin:xStep:xMax, yMax:yStep:yMin);
     thetas = zeros(size(nodeX));
@@ -56,5 +62,5 @@ for lambda = lambdas
     b = (-sin2theta ./ (2 * sigmaX2)) + (sin2theta ./ (2 * sigmaY2));
     c = (sinSQtheta ./ sigmaX2) + (cosSQtheta ./ sigmaY2);
     
-    test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, sprintf('./3d-seven-%d/', lambda) )
+    test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, sprintf('./fold-seven-%d/', lambda) )
 end

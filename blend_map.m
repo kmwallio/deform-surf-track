@@ -4,22 +4,26 @@ function [ x, y ] = blend_map( xS, yS, nodeXO, nodeYO, aO, bO, cO, alphasO, node
 
     nodeH = size(nodeYO, 1);
     nodeW = size(nodeXO, 2);
+    nodes = nodeH * nodeW;
     
-    x = 0;
-    y = 0;
+    avgX = (sum(sum(nodeX)) / nodes) - (sum(sum(nodeXO)) / nodes);
+    avgY = (sum(sum(nodeY)) / nodes) - (sum(sum(nodeXO)) / nodes);
     
-    guess = [xS, yS];
-    f = fminsearch(@to_min, guess);
+    guess = [(xS - avgX) (yS - avgY)];
+    [f, s] = fminsearch(@to_min, guess);
+    disp(s);
     x = f(1);
     y = f(2);
     
     function [sse] = to_min(gss)
-        sse = 0;
+        sse = zeros(nodeH * nodeW, 1);
         for h = 1:nodeH
             for w = 1:nodeW
-                sse = sse + abs(g_conf(xS, yS, nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w), alphas(h, w)) - g_conf(gss(1), gss(2), nodeXO(h, w), nodeYO(h, w), aO(h, w), bO(h, w), cO(h, w), alphasO(h, w)));
+                idx = ((h - 1) * nodeW) + w;
+                sse(idx) = abs((500 * g_conf(xS, yS, nodeX(h, w), nodeY(h, w), a(h, w), b(h, w), c(h, w), alphas(h, w))) - (500 * g_conf(gss(1), gss(2), nodeXO(h, w), nodeYO(h, w), aO(h, w), bO(h, w), cO(h, w), alphasO(h, w))));
             end
         end
+        sse = sum(sse);
     end
     
 %     divider = g_conf(xS, yS, nodeX, nodeY, a, b, c, alphas);

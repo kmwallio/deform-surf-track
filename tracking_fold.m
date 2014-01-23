@@ -39,19 +39,19 @@ disp('Processing video...');
 %open(mm);
 
 %Create the inital placement for the model
-xMax = 430;
-xMin = 180;
-xStep = (xMax - xMin) / 6;
-yMax = 330;
-yMin = 218;
-yStep = (yMin - yMax) / 4;
+% xMax = 430;
+% xMin = 180;
+% xStep = (xMax - xMin) / 6;
+% yMax = 330;
+% yMin = 218;
+% yStep = (yMin - yMax) / 4;
 
-% xMax = 410;
-% xMin = 200;
-% xStep = (xMax - xMin) / 3;
-% yMax = 310;
-% yMin = 228;
-% yStep = (yMin - yMax) / 2;
+xMax = 410;
+xMin = 200;
+xStep = (xMax - xMin) / 3;
+yMax = 310;
+yMin = 228;
+yStep = (yMin - yMax) / 2;
 
 % Meshgrid returns a set of points, we use these points as the
 % center of our nodes
@@ -135,7 +135,7 @@ for curFrame = 1:numFrames-2
     % Calculate the Elastic Deformation
     [nodeX, nodeY, a, b, c, alphas] = resize_model(nodeX, nodeY, a, b, c, alphas, 2);
     disp('  Elastic Deformation');
-    affMats = elastic_deformation(nodeX, nodeY, a, b, c, alphas, iX(:,:,curFrame), iY(:,:,curFrame), iT(:,:,curFrame));
+    affMats = elastic_deformation(nodeX, nodeY, a, b, c, alphas, iX(:,:,curFrame), iY(:,:,curFrame), iT(:,:,curFrame), 1);
     nodes = size(nodeX, 1) * size(nodeX, 2);
     width = size(nodeX, 2);
     height = size(nodeX, 1);
@@ -147,6 +147,6 @@ for curFrame = 1:numFrames-2
         end
     end
     
-    warpedImageFull = warp_image(warpedImageFull, fullFrames(:,:,curFrame + 1), nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas, affMats);
+    warpedImageFull = warp_image(warpedImageFull, fullFrames(:,:,curFrame + 1), nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas, affMats, true);
 end
 %close(mm);

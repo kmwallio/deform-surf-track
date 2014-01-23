@@ -23,14 +23,14 @@ cO = c;
 alphasO = alphas;
 figure;
 hold on;
-for idx = 3:length(inputFiles)
+for idx = length(inputFiles):-1:3
     myBar = waitbar(0, 'Processing');
     disp(strcat('On frame: ', num2str(idx - 2)));
     targetImg = imread(strcat(target_dir, frameFiles(idx).name), 'PNG');
     load(strcat(target_data, inputFiles(idx).name));
+    display_model( nodeX, nodeY, a, b, c, alphas, targetImg)
     width = size(targetImg, 2);
     height = size(targetImg, 1);
-    
     
     coverage = get_coverage_matrices( nodeX, nodeY, a, b, c, alphas, targetImg, targetImg, targetImg );
     covMat = sum(coverage, 3) >= 1;
@@ -49,17 +49,21 @@ for idx = 3:length(inputFiles)
     
     for h = startH:endH
         for w = startW:endW
-            donep = ((h-1) * width + w) / (width * height);
-            waitbar(donep, myBar, sprintf('%0.04f%%', donep * 100));
-            [tX, tY] = blend_map( w, h, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas );
-            tX = round(tX);
-            tY = round(tY);
-            if tX > 0 && tX < width && tY > 0 && tY < height
-                sourceCol = sourceImg(tY,tX,:);
-                if sourceCol(:,:,2) ~= 255
-                    targetImg(h, w, :) = sourceCol;
-                    imshow(targetImg);
-                    drawnow;
+            if covMat(h,w) ~= 0
+                donep = ((h-1) * width + w) / (width * height);
+                waitbar(donep, myBar, sprintf('%0.04f%%', donep * 100));
+                [tX, tY] = blend_map( w, h, nodeXO, nodeYO, aO, bO, cO, alphasO, nodeX, nodeY, a, b, c, alphas );
+                fprintf('(%.2f, %.2f) to (%.2f, %.2f)', w, h, tX, tY);
+                tX = round(tX);
+                tY = round(tY);
+                if tX > 0 && tX < width && tY > 0 && tY < height
+                    sourceCol = sourceImg(tY,tX,:);
+                    if sourceCol(:,:,2) ~= 255
+                        targetImg(h, w, :) = sourceCol;
+                        imshow(targetImg);
+                        %%display_model( nodeX, nodeY, a, b, c, alphas, targetImg)
+                        drawnow;
+                    end
                 end
             end
         end

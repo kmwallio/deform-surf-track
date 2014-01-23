@@ -11,7 +11,7 @@ function test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, out_dir )
     affMat = [1 0 0; 0 1 0; 0 0 1];
     
     frames = length(frameFiles);
-    fullFrame = double(rgb2gray(imread(strcat(in_dir, framesFiles(3).name)))) / 255;
+    fullFrame = double(rgb2gray(imread(strcat(in_dir, frameFiles(3).name)))) / 255;
     
 	warpedImageFull = fullFrame;
     warpedImageWindow = fullFrame;
@@ -38,7 +38,7 @@ function test_video( nodeX, nodeY, a, b, c, alphas, lambda, in_dir, out_dir )
 		cO = c;
 		alphasO = alphas;
         
-        fullFrame = double(rgb2gray(imread(strcat(in_dir, framesFiles(curFrame + 1).name)))) / 255;
+        fullFrame = double(rgb2gray(imread(strcat(in_dir, frameFiles(curFrame + 1).name)))) / 255;
 		halfFrame = imresize_old(fullFrame, 0.25);
 		quarterFrame = imresize_old(fullFrame, 0.25);
 		
